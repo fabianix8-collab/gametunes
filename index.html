@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{
+  width:392px;
+  height:700px;
+  background:transparent !important;
+  overflow:hidden;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  font-family:'Press Start 2P',monospace;
+}
+body{
+  padding-top:18px;
+}
+#drag{
+  position:fixed;
+  top:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:392px;
+  height:26px;
+  -webkit-app-region:drag;
+  z-index:9999;
+}
+
+
+/* ══ SHELL ══ */
+.gb{
+  width:392px;
+  margin-top:8px;
+  background:linear-gradient(180deg, #d0d0d0 0%, #c6c6c6 55%, #bdbdbd 100%);
+  border-radius:10px 10px 14px 14px;
+  position:relative;
+  padding-bottom:34px;
+  box-shadow:
+    inset 1px 1px 0 rgba(255,255,255,0.55),
+    inset -1px -1px 0 rgba(0,0,0,0.12),
+    0 6px 0 #a8a8a8,
+    0 10px 14px rgba(0,0,0,0.28);
+}
+
+
+/* top ridge line */
+.gb-top{
+  background:linear-gradient(180deg, #d8d8d8 0%, #bcbcbc 100%);
+  border-radius:9px 9px 0 0;
+  height:22px;
+  border-bottom:2px solid #909090;
+  border-top:1px solid rgba(255,255,255,0.8);
+  display:flex;align-items:center;
+  padding:0 14px;
+  -webkit-app-region:drag;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+}
+.battery-lbl{font-size:5px;color:#666;letter-spacing:1px;font-family:'Press Start 2P',monospace;}
+.led{width:8px;height:8px;border-radius:50%;background:#cc0000;border:1px solid #880000;margin-left:6px;-webkit-app-region:no-drag;}
+.led.on{background:#ff0000;box-shadow:0 0 5px #ff0000;animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.gb-title-lbl{font-size:6px;color:#555;letter-spacing:2px;margin-left:auto;-webkit-app-region:no-drag;font-family:'Press Start 2P',monospace;}
+.win-btns{display:flex;gap:3px;margin-left:8px;-webkit-app-region:no-drag;}
+.wbtn{width:14px;height:14px;border-radius:2px;border:1px solid #888;background:#d0d0d0;font-size:8px;color:#555;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.wbtn:hover{background:#e8e8e8;}
+.wbtn.x:hover{background:#e05050;color:#fff;border-color:#a02020;}
+
+
+/* ══ SCREEN SURROUND ══ */
+.bezel{
+  margin:10px 20px 0;
+  background:linear-gradient(180deg, #9a9aaa 0%, #8a8a9b 100%);
+  border:3px solid #666674;
+  border-radius:6px 6px 2px 2px;
+  padding:10px 10px 18px;
+  box-shadow:
+    inset 2px 2px 4px rgba(0,0,0,0.35),
+    inset -1px -1px 2px rgba(255,255,255,0.12),
+    0 1px 0 rgba(255,255,255,0.18);
+}
+.bezel-lbl{
+  font-size:6px;color:#c0c0d0;
+  text-align:center;margin-bottom:8px;
+  letter-spacing:2px;font-family:'Press Start 2P',monospace;
+}
+
+
+/* ══ LCD ══ */
+.screen{
+  background:linear-gradient(180deg, #9ac00f 0%, #8bac0a 52%, #7f9e08 100%);
+  border-top:4px solid #121212;
+  border-left:4px solid #161616;
+  border-right:4px solid #2c2c2c;
+  border-bottom:4px solid #2c2c2c;
+  border-radius:2px;
+  padding:7px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:
+    inset 0 0 14px rgba(0,0,0,0.38),
+    inset 1px 1px 3px rgba(255,255,255,0.08);
+}
+.screen::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0.04) 0px,rgba(0,0,0,0.04) 1px,transparent 1px,transparent 3px);
+  pointer-events:none;
+  z-index:20;
+}
+
+
+.s-bar{display:flex;justify-content:space-between;font-size:7px;color:#0f2a04;margin-bottom:5px;}
+.s-row{display:flex;gap:7px;margin-bottom:5px;}
+.s-art{width:54px;height:54px;flex-shrink:0;border:3px solid #0f2a04;background:#5a7a10;position:relative;overflow:hidden;}
+.s-art img{width:100%;height:100%;object-fit:cover;display:none;position:relative;z-index:2;}
+.s-art-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;}
+.s-info{flex:1;overflow:hidden;}
+.s-blink{font-size:6px;color:#2a5010;margin-bottom:3px;animation:blink .9s step-end infinite;}
+.s-title{font-size:8px;color:#0f2a04;white-space:nowrap;overflow:hidden;display:block;margin-bottom:3px;}
+.s-title.roll{animation:roll 9s linear infinite;}
+@keyframes roll{0%,15%{transform:translateX(0)}85%,100%{transform:translateX(-55%)}}
+.s-artist{font-size:6px;color:#2a5010;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+
+.s-eq{display:flex;align-items:flex-end;gap:2px;height:20px;margin-bottom:4px;}
+.eq-col{display:flex;flex-direction:column-reverse;gap:1px;}
+.ep{width:7px;height:3px;background:#2a5010;opacity:.18;}
+.ep.on{opacity:1;background:#0f2a04;}
+
+
+.seek-wrap{margin-bottom:3px;cursor:pointer;}
+.seek-bg{height:8px;background:#5a7a10;border:2px solid #0f2a04;position:relative;}
+.seek-fill{height:100%;background:#0f2a04;width:0%;transition:width .4s linear;position:relative;}
+.seek-fill::after{content:'';position:absolute;right:-3px;top:-3px;width:6px;height:14px;background:#0f2a04;}
+.s-times{display:flex;justify-content:space-between;font-size:6px;color:#2a5010;margin-bottom:3px;}
+
+
+.vol-wrap{display:flex;align-items:center;gap:4px;}
+.vol-lbl{font-size:6px;color:#2a5010;white-space:nowrap;}
+.vol-track{flex:1;height:6px;background:#5a7a10;border:2px solid #0f2a04;position:relative;cursor:pointer;}
+.vol-fill{height:100%;background:#0f2a04;width:80%;}
+
+
+/* ══ NINTENDO LABEL ══ */
+.nintendo-label{
+  text-align:center;
+  padding:6px 20px 2px;
+  font-size:8px;
+  color:#444;
+  letter-spacing:1px;
+  font-style:italic;
+  font-family:Georgia,serif;
+}
+.nintendo-label span{
+  font-size:10px;
+  font-weight:bold;
+  font-family:Georgia,serif;
+  letter-spacing:2px;
+}
+
+
+/* ══ CONTROLS ══ */
+.gb-body{padding:4px 20px 0;display:flex;flex-direction:column;gap:8px;}
+.ctrl-row{display:flex;align-items:center;justify-content:space-between;gap:0;}
+
+
+/* D-PAD - black like original */
+.dpad{width:88px;height:88px;position:relative;}
+.dp{
+  position:absolute;
+  background:#222;
+  border:1px solid #080808;
+  box-shadow:
+    0 4px 0 #000,
+    0 5px 3px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.07);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:#555;
+  user-select:none;transition:transform .08s,box-shadow .08s;
+}
+.dp:active{transform:translateY(2px);box-shadow:0 0 0 #000;}
+.dp-u{top:0;left:26px;width:34px;height:28px;border-radius:3px 3px 0 0;}
+.dp-d{bottom:0;left:26px;width:34px;height:28px;border-radius:0 0 3px 3px;}
+.dp-l{top:26px;left:0;width:28px;height:34px;border-radius:3px 0 0 3px;}
+.dp-r{top:26px;right:0;width:28px;height:34px;border-radius:0 3px 3px 0;}
+.dp-c{top:26px;left:26px;width:34px;height:34px;background:#181818;cursor:default;}
+
+
+/* A/B - dark red like original */
+.ab{display:flex;flex-direction:column;gap:4px;align-items:center;width:112px;margin-top:-6px;}
+.ab-row{display:flex;gap:14px;align-items:center;}
+.abtn{
+  width:42px;height:42px;border-radius:50%;
+  border:none;
+  box-shadow:
+    0 5px 0 #3a0008,
+    0 6px 4px rgba(0,0,0,0.4),
+    inset 0 -3px 4px rgba(0,0,0,0.35),
+    inset 0 2px 3px rgba(255,255,255,0.15);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:#fff;
+  user-select:none;transition:transform .08s,box-shadow .08s;
+  font-family:'Press Start 2P',monospace;
+  background:radial-gradient(circle at 38% 32%, #e8003a 0%, #aa0020 50%, #6a0012 100%);
+}
+.abtn:active{transform:translateY(3px);box-shadow:0 1px 0 #400008;}
+.btn-b{margin-top:18px;}
+.btn-a{background:#bb0028;margin-top:0;}
+.ab-btn-wrap{display:flex;flex-direction:column;align-items:center;gap:7px;}
+.ab-single-lbl{font-size:6px;color:#555;font-family:'Press Start 2P',monospace;text-align:center;}
+
+
+/* VOL buttons diagonal like original SELECT/START */
+.ss-row{
+  display:flex;
+  flex-direction:row;
+  justify-content:center;
+  align-items:flex-start;
+  gap:10px;
+  margin-top:0;
+  margin-left:10px;
+}
+.ss-wrap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+}
+.ss-lbl{
+  font-size:6px;
+  color:#555;
+  font-family:'Press Start 2P',monospace;
+  letter-spacing:0.5px;
+  text-align:center;
+}
+.ss{
+  background:linear-gradient(180deg, #b8b8b8 0%, #989898 100%);
+  border-top:1px solid #d0d0d0;
+  border-left:1px solid #c8c8c8;
+  border-right:1px solid #686868;
+  border-bottom:2px solid #686868;
+  box-shadow:0 3px 0 #585858, inset 0 1px 0 rgba(255,255,255,0.5);
+  padding:5px 16px;
+  border-radius:12px;
+  font-size:0px;
+  width:44px;
+  height:14px;
+  cursor:pointer;user-select:none;
+}
+.ss:active{box-shadow:0 0 0 #585858;transform:translateY(3px);}
+
+
+/* speaker grid - bottom right like original */
+.spk{
+  display:grid;
+  grid-template-columns:repeat(6,6px);
+  grid-template-rows:repeat(4,6px);
+  gap:3px;
+  position:absolute;
+  bottom:8px;right:10px;
+}
+.sh{width:6px;height:6px;background:#a0a0a0;border-radius:50%;border:1px solid #888;}
+
+
+/* ══ MODAL ══ */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);align-items:center;justify-content:center;z-index:500;}
+.modal-bg.open{display:flex;}
+.modal{width:360px;background:#d0d0d0;border:3px solid #808080;box-shadow:4px 4px 0 #404040;}
+.modal-hd{background:#606060;padding:7px 12px;font-size:7px;color:#eee;letter-spacing:2px;display:flex;justify-content:space-between;align-items:center;font-family:'Press Start 2P',monospace;}
+.modal-hd span:last-child{cursor:pointer;font-size:10px;}
+.modal-bd{padding:12px;}
+.sinp{width:100%;background:#8bac0a;border:3px solid #0f2a04;color:#0f2a04;font-family:'Press Start 2P',monospace;font-size:8px;padding:8px 10px;outline:none;margin-bottom:10px;}
+.sinp::placeholder{color:#2a5010;}
+.mbtns{display:flex;gap:8px;margin-bottom:10px;}
+.mbtn{flex:1;background:#a0a0a0;border:2px solid #606060;box-shadow:0 2px 0 #404040;font-family:'Press Start 2P',monospace;font-size:7px;color:#222;padding:7px 4px;cursor:pointer;letter-spacing:1px;}
+.mbtn:active{transform:translateY(2px);box-shadow:0 0 0 #404040;}
+.mbtn.cancel{background:#990020;color:#fff;border-color:#600010;}
+.rlist{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
+.rlist::-webkit-scrollbar{width:6px;}
+.rlist::-webkit-scrollbar-track{background:#c0c0c0;}
+.rlist::-webkit-scrollbar-thumb{background:#606060;}
+.rrow{display:flex;gap:8px;padding:6px;background:#b8b8b8;border:2px solid #808080;cursor:pointer;align-items:center;}
+.rrow:hover{background:#d8d8d8;border-color:#404040;}
+.rrow img{width:58px;height:38px;object-fit:cover;border:2px solid #404040;flex-shrink:0;}
+.ri{flex:1;overflow:hidden;}
+.rn{font-size:7px;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;font-family:'Press Start 2P',monospace;}
+.rc{font-size:6px;color:#444;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Press Start 2P',monospace;}
+.ldtxt{font-size:7px;color:#444;display:none;animation:blink .6s step-end infinite;padding:6px 0;font-family:'Press Start 2P',monospace;}
+.ldtxt.on{display:block;}
+.errtxt{font-size:7px;color:#800000;padding:4px 0;font-family:'Press Start 2P',monospace;}
+</style>
+</head>
+<body>
+<div id="drag"></div>
+<div class="gb">
+  <div class="gb-top">
+    <span class="battery-lbl">BATTERY</span>
+    <div class="led on"></div>
+    <span class="gb-title-lbl">GAME TUNES™</span>
+    <div class="win-btns">
+      <div class="wbtn" onclick="if(window.electronAPI)window.electronAPI.hideApp()">_</div>
+      <div class="wbtn x" onclick="if(window.electronAPI)window.electronAPI.closeApp()">×</div>
+    </div>
+  </div>
+
+  <div class="bezel">
+    <div class="bezel-lbl">DOT MATRIX WITH STEREO SOUND</div>
+    <div class="screen">
+      <div class="s-bar">
+        <span id="s-trk">TRK:--</span>
+        <span id="s-st">INSERT COIN</span>
+        <span id="s-vol">VOL:80</span>
+      </div>
+      <div class="s-row">
+        <div class="s-art">
+          <div class="s-art-ph">
+            <svg width="34" height="34" viewBox="0 0 34 34">
+              <rect x="17" y="4" width="5" height="17" fill="#0f2a04"/>
+              <rect x="22" y="4" width="8" height="6" fill="#0f2a04"/>
+              <ellipse cx="14" cy="24" rx="6" ry="4" fill="#0f2a04"/>
+            </svg>
+          </div>
+          <img id="art-img" src="" alt=""/>
+        </div>
+        <div class="s-info">
+          <div class="s-blink">* NOW PLAYING *</div>
+          <span class="s-title" id="s-title">GAME TUNES</span>
+          <div class="s-artist" id="s-artist">PRESS START</div>
+        </div>
+      </div>
+      <div class="s-eq" id="s-eq"></div>
+      <div class="seek-wrap" id="seek-wrap">
+        <div class="seek-bg"><div class="seek-fill" id="seek-fill"></div></div>
+      </div>
+      <div class="s-times"><span id="s-cur">0:00</span><span id="s-tot">0:00</span></div>
+      <div class="vol-wrap">
+        <span class="vol-lbl">VOL</span>
+        <div class="vol-track" id="vol-track"><div class="vol-fill" id="vol-fill"></div></div>
+        <span class="vol-lbl" id="s-vol2">80</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="nintendo-label">Nintendo <span>GAME BOY</span>™</div>
+
+  <div class="gb-body">
+    <div class="ctrl-row">
+      <div class="dpad">
+        <div class="dp dp-u" onclick="seekRel(-10)">▲</div>
+        <div class="dp dp-d" onclick="seekRel(10)">▼</div>
+        <div class="dp dp-l" onclick="prevSong()">◄</div>
+        <div class="dp dp-r" onclick="nextSong()">►</div>
+        <div class="dp dp-c"></div>
+      </div>
+      <div class="ss-row">
+        <div class="ss-wrap" style="margin-top:12px;">
+          <div class="ss" onclick="volDown()"></div>
+          <div class="ss-lbl">VOL-</div>
+        </div>
+        <div class="ss-wrap" style="margin-top:0px;">
+          <div class="ss" onclick="volUp()"></div>
+          <div class="ss-lbl">VOL+</div>
+        </div>
+      </div>
+      <div class="ab">
+        <div class="ab-row">
+          <div class="ab-btn-wrap">
+            <div class="abtn btn-b" onclick="openModal()">B</div>
+            <span class="ab-single-lbl">SEARCH</span>
+          </div>
+          <div class="ab-btn-wrap">
+            <div class="abtn btn-a" onclick="togglePlay()">A</div>
+            <span class="ab-single-lbl">PLAY</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spk">
+    <div class="sh"></div><div class="sh"></div><div class="sh"></div>
+    <div class="sh"></div><div class="sh"></div><div class="sh"></div>
+    <div class="sh"></div><div class="sh"></div><div class="sh"></div>
+    <div class="sh"></div><div class="sh"></div><div class="sh"></div>
+    <div class="sh"></div><div class="sh"></div><div class="sh"></div>
+    <div class="sh"></div><div class="sh"></div><div class="sh"></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <div class="modal-hd"><span>** MUSIC SEARCH **</span><span onclick="closeModal()">X</span></div>
+    <div class="modal-bd">
+      <input class="sinp" id="sinp" type="text" placeholder="SONG OR ARTIST..." onkeydown="if(event.key==='Enter')doSearch()"/>
+      <div class="mbtns">
+        <div class="mbtn" onclick="doSearch()">SEARCH</div>
+        <div class="mbtn cancel" onclick="closeModal()">CANCEL</div>
+      </div>
+      <div class="ldtxt" id="ldtxt">LOADING...</div>
+      <div class="rlist" id="rlist"></div>
+    </div>
+  </div>
+</div>
+
+<div id="yt-container" style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;"></div>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+// ★ PON TU API KEY AQUI ★
+const YT_API_KEY = process.env.YT_API_KEY || 'TU_API_KEY_AQUI';
+
+let player=null,playing=false,playlist=[],idx=0,vol=80;
+let progInt=null,eqInt=null;
+
+const eqEl=document.getElementById('s-eq');
+for(let c=0;c<16;c++){
+  const col=document.createElement('div');col.className='eq-col';col.id='ec'+c;
+  for(let r=0;r<4;r++){const p=document.createElement('div');p.className='ep';col.appendChild(p);}
+  eqEl.appendChild(col);
+}
+
+function startEQ(){
+  if(eqInt)return;
+  eqInt=setInterval(()=>{
+    for(let c=0;c<16;c++){
+      const col=document.getElementById('ec'+c);if(!col)return;
+      const h=Math.floor(Math.random()*4)+1;
+      Array.from(col.children).forEach((p,i)=>p.classList.toggle('on',i<h));
+    }
+  },130);
+}
+function stopEQ(){
+  clearInterval(eqInt);eqInt=null;
+  for(let c=0;c<16;c++){
+    const col=document.getElementById('ec'+c);
+    if(col)Array.from(col.children).forEach(p=>p.classList.remove('on'));
+  }
+}
+
+function onYouTubeIframeAPIReady(){
+  player=new YT.Player('yt-container',{
+    height:'1',width:'1',
+    playerVars:{autoplay:1,controls:0},
+    events:{onStateChange:onState,onReady:(e)=>{e.target.setVolume(vol);}}
+  });
+}
+
+function onState(e){
+  if(e.data===YT.PlayerState.PLAYING){
+    playing=true;document.getElementById('s-st').textContent='PLAYING';
+    startEQ();startProg();
+  } else if(e.data===YT.PlayerState.PAUSED||e.data===YT.PlayerState.ENDED){
+    playing=false;
+    document.getElementById('s-st').textContent=e.data===YT.PlayerState.PAUSED?'PAUSED':'GAME OVER';
+    stopEQ();
+    if(e.data===YT.PlayerState.ENDED)nextSong();
+  }
+}
+
+function startProg(){
+  if(progInt)clearInterval(progInt);
+  progInt=setInterval(()=>{
+    if(!player||!playing)return;
+    const c=player.getCurrentTime()||0,d=player.getDuration()||1;
+    document.getElementById('s-cur').textContent=fmt(c);
+    document.getElementById('s-tot').textContent=fmt(d);
+    document.getElementById('seek-fill').style.width=((c/d)*100)+'%';
+  },500);
+}
+
+function fmt(s){const m=Math.floor(s/60);return m+':'+(Math.floor(s%60)<10?'0':'')+Math.floor(s%60);}
+function togglePlay(){if(!player||!playlist.length)return;if(playing)player.pauseVideo();else player.playVideo();}
+
+function loadSong(i){
+  if(!player||!playlist.length)return;
+  idx=i;const s=playlist[i];
+  player.loadVideoById(s.videoId);
+  player.setVolume(vol);
+  const t=document.getElementById('s-title');
+  t.textContent=s.title.toUpperCase().substring(0,16);
+  t.classList.toggle('roll',s.title.length>10);
+  document.getElementById('s-artist').textContent=s.channel.toUpperCase().substring(0,20);
+  document.getElementById('s-trk').textContent='TRK:'+(i+1);
+  document.getElementById('s-vol').textContent='VOL:'+vol;
+  const img=document.getElementById('art-img');
+  img.onload=()=>{img.style.display='block';document.querySelector('.s-art-ph').style.display='none';};
+  img.src=s.thumb;
+  if(window.electronAPI)window.electronAPI.nowPlaying(s.title+' - '+s.channel);
+}
+
+function nextSong(){if(playlist.length)loadSong((idx+1)%playlist.length);}
+function prevSong(){if(playlist.length)loadSong((idx-1+playlist.length)%playlist.length);}
+function seekRel(sec){if(player)player.seekTo((player.getCurrentTime()||0)+sec,true);}
+
+function setVol(v){
+  vol=Math.max(0,Math.min(100,v));
+  document.getElementById('s-vol').textContent='VOL:'+vol;
+  document.getElementById('s-vol2').textContent=vol;
+  document.getElementById('vol-fill').style.width=vol+'%';
+  if(player&&player.setVolume)player.setVolume(vol);
+}
+function volUp(){setVol(vol+10);}
+function volDown(){setVol(vol-10);}
+
+document.getElementById('seek-wrap').addEventListener('click',function(e){
+  if(!player||!playlist.length)return;
+  const r=this.getBoundingClientRect();
+  player.seekTo(((e.clientX-r.left)/r.width)*(player.getDuration()||0),true);
+});
+document.getElementById('vol-track').addEventListener('click',function(e){
+  const r=this.getBoundingClientRect();
+  setVol(Math.round(((e.clientX-r.left)/r.width)*100));
+});
+
+function openModal(){document.getElementById('modal-bg').classList.add('open');document.getElementById('sinp').focus();}
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
+
+async function doSearch(){
+  const q=document.getElementById('sinp').value.trim();if(!q)return;
+  const ld=document.getElementById('ldtxt'),rs=document.getElementById('rlist');
+  ld.classList.add('on');rs.innerHTML='';
+  if(YT_API_KEY==='TU_API_KEY_AQUI'){ld.classList.remove('on');rs.innerHTML='<div class="errtxt">!! SET API KEY !!</div>';return;}
+  try{
+    const res=await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=7&q=${encodeURIComponent(q)}&key=${YT_API_KEY}`);
+    const data=await res.json();ld.classList.remove('on');
+    if(data.error){rs.innerHTML=`<div class="errtxt">API ERR: ${data.error.message.substring(0,50)}</div>`;return;}
+    if(!data.items||!data.items.length){rs.innerHTML='<div class="errtxt">NO RESULTS</div>';return;}
+    playlist=data.items.map(it=>({videoId:it.id.videoId,title:it.snippet.title,channel:it.snippet.channelTitle,thumb:it.snippet.thumbnails.default.url}));
+    playlist.forEach((s,i)=>{
+      const row=document.createElement('div');row.className='rrow';
+      row.innerHTML=`<img src="${s.thumb}" alt=""/><div class="ri"><div class="rn">${s.title.substring(0,40)}${s.title.length>40?'..':''}</div><div class="rc">${s.channel}</div></div>`;
+      row.onclick=()=>{loadSong(i);closeModal();};
+      rs.appendChild(row);
+    });
+  }catch(err){ld.classList.remove('on');rs.innerHTML=`<div class="errtxt">ERR: ${err.message.substring(0,50)}</div>`;}
+}
+
+if(window.electronAPI){
+  window.electronAPI.onTrayCmd(cmd=>{
+    if(cmd==='toggle')togglePlay();
+    else if(cmd==='next')nextSong();
+    else if(cmd==='prev')prevSong();
+  });
+}
+
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('modal-bg').classList.contains('open'))return;
+  if(e.code==='Space'){e.preventDefault();togglePlay();}
+  if(e.code==='ArrowLeft')prevSong();
+  if(e.code==='ArrowRight')nextSong();
+  if(e.code==='ArrowUp'){e.preventDefault();seekRel(-10);}
+  if(e.code==='ArrowDown'){e.preventDefault();seekRel(10);}
+});
+</script>
+</body>
+</html>
