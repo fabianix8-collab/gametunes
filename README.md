@@ -4,6 +4,16 @@ Widget de escritorio con estética retro Game Boy para reproducir música desde 
 
 ![Electron](https://img.shields.io/badge/Electron-28-blue) ![YouTube API](https://img.shields.io/badge/YouTube-Data%20API%20v3-red)
 
+## 📸 Screenshots
+
+| Pantalla principal | Reproduciendo |
+|---|---|
+| ![Main](screenshot1.png) | ![Playing](screenshot3.png) |
+
+| Buscador | Resultados de búsqueda |
+|---|---|
+| ![Search empty](screenshot4.png) | ![Search results](screenshot2.png) |
+
 ## ✨ Características
 
 - Diseño retro inspirado en el Game Boy original
@@ -17,7 +27,7 @@ Widget de escritorio con estética retro Game Boy para reproducir música desde 
 
 ```bash
 # Clona el repositorio
-git clone https://github.com/tu-usuario/gametunes.git
+git clone https://github.com/fabianix8-collab/gametunes.git
 cd gametunes
 
 # Instala dependencias
